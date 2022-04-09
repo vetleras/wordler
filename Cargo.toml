@@ -1,8 +1,12 @@
 [package]
-name = "wordle"
+name = "wordler"
 version = "0.1.0"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+rand = "0.8.4"
+termion = "1.5.6"
+itertools = "0.10.2"
+derive_more = "0.99.0"

@@ -1,63 +1,30 @@
-use std::cmp;
+pub mod guess;
+pub mod guesser;
 
-#[derive(Debug, Copy, Clone, PartialEq, Eq)]
-enum Letter {
-    Green(char),
-    Yellow(char),
-    Grey(char),
-}
+use std::fmt;
+use std::str;
 
-#[derive(Debug, Clone, Eq, PartialEq)]
-struct Guess(Vec<Letter>);
+extern crate derive_more;
 
-type Word = Vec<char>;
+#[derive(Debug, Default, derive_more::Deref)]
+pub struct Word(Vec<u8>);
 
-impl Guess {
-    pub fn new(wordle: &Word, guess: &Word) -> Guess {
-        let mut letters: Vec<Letter> = Vec::new();
-        // Green pass
-        for (i, &c) in guess.iter().enumerate() {
-            letters.push({
-                if c == wordle[i] {
-                    Letter::Green(c)
-                } else {
-                    Letter::Grey(c)
-                }
-            });
-        }
-        // Yellow pass
-        for i in 0..letters.len() {
-            if let Letter::Grey(c) = letters[i] {
-                let wordle_occurances = wordle.iter().filter(|&&x| c == x).count();
-                let guess_occurances = guess.iter().filter(|&&x| c == x).count();
-                let letter_occurances = letters
-                    .iter()
-                    .filter(|&&x| x == Letter::Green(c) || x == Letter::Yellow(c))
-                    .count();
-                if letter_occurances < cmp::min(guess_occurances, wordle_occurances) {
-                    letters[i] = Letter::Yellow(c);
-                }
-            }
-        }
-        Guess(letters)
+impl fmt::Display for Word {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        f.write_str(str::from_utf8(&self.0).unwrap())
     }
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-    #[test]
-    fn it_works() {
-        let wordle = "abaacc".chars().collect();
-        let guess = "aaabad".chars().collect();
-        let v: Vec<Letter> = vec![
-            Letter::Green('a'),
-            Letter::Yellow('a'),
-            Letter::Green('a'),
-            Letter::Yellow('b'),
-            Letter::Grey('a'),
-            Letter::Grey('d'),
-        ];
-        assert_eq!(Guess::new(&wordle, &guess), Guess(v));
+impl From<&str> for Word {
+    fn from(string: &str) -> Self {
+        assert_eq!(string.len(), 5);
+        Word(string.bytes().collect())
+    }
+}
+
+impl From<String> for Word {
+    fn from(string: String) -> Self {
+        assert_eq!(string.len(), 5);
+        Word(string.bytes().collect())
     }
 }

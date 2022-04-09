@@ -1,52 +1,20 @@
-#[derive(Debug, Copy, Clone, PartialEq, Eq)]
-enum Letter {
-    Green(char),
-    Yellow(char),
-    Grey(char),
-}
+use wordler::{Word, guesser::Guesser};
+use std::env;
+use wordler::guesser;
 
-#[derive(Debug, Clone)]
-struct Guess(Vec<Letter>);
-type Word = Vec<char>;
-
-impl Guess {
-    pub fn new(guess: &Word, wordle: &Word) -> Guess {
-        let mut letters: Vec<Letter> = Vec::new();
-        for (i, &c) in guess.iter().enumerate() {
-            letters.push({
-                if c == wordle[i] {
-                    Letter::Green(c)
-                } else if wordle.contains(&c)
-                    && letters
-                        .iter()
-                        .filter(|&&l| l == Letter::Green(c) || l == Letter::Yellow(c))
-                        .count()
-                        >= wordle.iter().filter(|&&l| l == c).count()
-                {
-                    Letter::Yellow(c)
-                } else {
-                    Letter::Grey(c)
-                }
-            });
-        }
-        Guess(letters)
-    }
+fn parse_words(string: &str) -> Vec<Word> {
+    string.lines().map(|l| Word::from(l)).collect()
 }
 
 fn main() {
-    let g = Guess::new(&"hello".chars().collect(), &"hello".chars().collect());
-    println!("{:?}", g)
-}
-/*
-    wordle must contain c
-    number of yellows in guess must not exceed number of this letter in wordle
-*/
+    let words = parse_words(include_str!("../allowed_words.txt"));
+    //let wordles = parse_words(include_str!("../possible_words.txt"));
 
-#[cfg(test)]
-mod tests {
-    #[test]
-    fn it_works() {
-        assert_eq!(2 + 2, 4);
+    let wordle = Word::from(env::args().nth(1).unwrap());
+    let scorer = guesser::Scorer::default();
+
+    println!("Guessing {}", wordle);
+    for guess in scorer.play(&words, &wordle) {
+        println!("{}", guess);
     }
 }
-
