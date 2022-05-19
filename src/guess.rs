@@ -5,14 +5,14 @@ use termion::color;
 
 use super::Word;
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum Tile {
     Green,
     Yellow,
     Gray,
 }
 
-#[derive(Debug, derive_more::Deref)]
+#[derive(Debug, derive_more::Deref, PartialEq, Eq, Hash, Clone)]
 pub struct Guess(Vec<(u8, Tile)>);
 
 impl Guess {

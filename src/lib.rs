@@ -1,12 +1,12 @@
 pub mod guess;
-pub mod guesser;
+pub mod filter;
 
 use std::fmt;
 use std::str;
 
 extern crate derive_more;
 
-#[derive(Debug, Default, derive_more::Deref)]
+#[derive(Debug, Default, derive_more::Deref, PartialEq, Eq, Hash, Clone)]
 pub struct Word(Vec<u8>);
 
 impl fmt::Display for Word {
